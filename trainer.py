@@ -46,7 +46,7 @@ class StepByStep(object):
         # These attributes are defined here, but since they are
         # not informed at the moment of creation, we keep them None
         self.train_loader = None
-        self.discriminator_loader = None
+        self.generator_loader = None
         self.writer = None
         self.scheduler = None
         self.is_batch_lr_scheduler = False
@@ -84,12 +84,12 @@ class StepByStep(object):
             print(f"Couldn't send it to {device}, sending it to {self.device} instead.")
             self.model.to(self.device)
 
-    def set_loaders(self, train_loader, discriminator_loader=None):
+    def set_loaders(self, train_loader, generator_loader=None):
         # This method allows the user to define which train_loader (and val_loader, optionally) to use
         # Both loaders are then assigned to attributes of the class
         # So they can be referred to later
         self.train_loader = train_loader
-        self.discriminator_loader = discriminator_loader
+        self.generator_loader = generator_loader
 
     def set_tensorboard(self, name, folder='runs'):
         # This method allows the user to define a SummaryWriter to interface with TensorBoard
@@ -105,34 +105,37 @@ class StepByStep(object):
             # Sets model to TRAIN mode
             self.model.train()
 
-            # training generator
+            # training discriminator
+            self.discriminator_optimizer.zero_grad()
             x_hat = self.model(x, obj='generator')
-            self.generator_optimizer.zero_grad()
-            pred_fake = self.model(x_hat, obj='discriminator')
-            loss_generator = self.loss_fn(pred_fake, torch.ones_like(pred_fake))
-            loss_generator.backward()
-            self.generator_optimizer.step()
+            pred_real = self.model(x.to(self.device), obj='discriminator')
+            pred_fake = self.model(x_hat.detach(), obj='discriminator')
+            loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
+            loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
+            loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
+            loss_discriminator.backward()
+            self.discriminator_optimizer.step()
+
+
+
 
             # training discriminator
             for i in range(self.n_clip):
                 if i == 0:
-                    x_discriminator, y_discriminator = x, y
+                    x_generator, y_generator = x, y
                 else:
-                    discriminator_iterator = iter(self.discriminator_loader)
+                    generator_iterator = iter(self.generator_loader)
                     try:
-                        x_discriminator, y_discriminator = next(discriminator_iterator)
+                        x_generator, y_generator = next(generator_iterator)
                     except StopIteration:
-                        discriminator_iterator = iter(self.discriminator_loader)
-                        x_discriminator, y_discriminator = next(discriminator_iterator)
-                self.discriminator_optimizer.zero_grad()
-                x_hat = self.model(x, obj='generator')
-                pred_real = self.model(x_discriminator.to(self.device), obj='discriminator')
-                pred_fake = self.model(x_hat.detach(), obj='discriminator')
-                loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
-                loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
-                loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
-                loss_discriminator.backward()
-                self.discriminator_optimizer.step()
+                        generator_iterator = iter(self.generator_loader)
+                        x_generator, y_generator = next(generator_iterator)
+                x_hat = self.model(x_generator, obj='generator')
+                self.generator_optimizer.zero_grad()
+                pred_fake = self.model(x_hat, obj='discriminator')
+                loss_generator = self.loss_fn(pred_fake, torch.ones_like(pred_fake))
+                loss_generator.backward()
+                self.generator_optimizer.step()
             # Returns the loss
             return loss_generator.item(), loss_discriminator_fake.item(), loss_discriminator_real.item()
         # Returns the function that will be called inside the train loop

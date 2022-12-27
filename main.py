@@ -96,7 +96,7 @@ def main(args):
 
     train_data = TensorDataset(scaled_x_train_tensor.float(), scaled_y_train_tensor.float())
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-    discriminator_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    generator_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
     torch.manual_seed(43)
 
@@ -126,7 +126,7 @@ def main(args):
                          save_checkpoints=True, checkpoints_directory=checkpoints_directory_name, checkpoint_context=params, initial_epoch=initial_epoch,
                          initial_generator_losses=initial_generator_losses, initial_discriminator_fake_losses=initial_discriminator_fake_losses,
                          initial_discriminator_real_losses=initial_discriminator_real_losses, device=args.device)
-    trainer.set_loaders(train_loader, discriminator_loader)
+    trainer.set_loaders(train_loader, generator_loader)
     trainer.set_tensorboard(tensorboard_model, folder='experiments/tensorboards')
     trainer.train(epochs, n_clip=n_clip)
 
