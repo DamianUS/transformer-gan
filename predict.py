@@ -17,16 +17,21 @@ def prepare_model(n_features, checkpoint):
     print(args)
     checkpoint_context = checkpoint['model_params']
     seq_len = checkpoint_context["seq_len"]
-    lr = checkpoint_context["lr"]
-    dropout = checkpoint_context["dropout"]
+    gen_lr = checkpoint_context["gen_lr"]
+    dis_lr = checkpoint_context["dis_lr"]
+    gen_dropout = checkpoint_context["gen_dropout"]
+    dis_dropout = checkpoint_context["dis_dropout"]
     batch_size = checkpoint_context["batch_size"]
-    num_layers = checkpoint_context["num_layers"]
-    hidden_dim = checkpoint_context["hidden_dim"]
-    narrow_attn_heads = checkpoint_context["narrow_attn_heads"]
-    model = TransformerGAN(num_features=n_features, seq_len=seq_len, batch_size=batch_size, num_layers=num_layers, hidden_dim=hidden_dim, narrow_attn_heads=narrow_attn_heads, dropout=dropout, noise_length=100)
+    gen_num_layers = checkpoint_context["gen_num_layers"]
+    dis_num_layers = checkpoint_context["dis_num_layers"]
+    gen_hidden_dim = checkpoint_context["gen_hidden_dim"]
+    dis_hidden_dim = checkpoint_context["dis_hidden_dim"]
+    gen_narrow_attn_heads = checkpoint_context["gen_narrow_attn_heads"]
+    dis_narrow_attn_heads = checkpoint_context["dis_narrow_attn_heads"]
+    model = TransformerGAN(num_features=n_features, seq_len=seq_len, batch_size=batch_size, gen_num_layers=gen_num_layers, dis_num_layers=dis_num_layers, gen_hidden_dim=gen_hidden_dim, dis_hidden_dim=dis_hidden_dim, gen_narrow_attn_heads=gen_narrow_attn_heads, dis_narrow_attn_heads=dis_narrow_attn_heads, gen_dropout=gen_dropout, dis_dropout=dis_dropout, noise_length=100)
     model.to(args.device)
-    generator_optimizer = optim.Adam(model.generator.parameters(), lr=lr)
-    discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=lr)
+    generator_optimizer = optim.Adam(model.generator.parameters(), lr=gen_lr)
+    discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=dis_lr)
     model.load_state_dict(checkpoint['model_state_dict'])
     generator_optimizer.load_state_dict(checkpoint['generator_optimizer_state_dict'])
     discriminator_optimizer.load_state_dict(checkpoint['discriminator_optimizer_state_dict'])
