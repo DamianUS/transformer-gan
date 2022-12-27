@@ -10,7 +10,7 @@ class TransformerGAN(torch.nn.Module):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.noise_length = noise_length
-        self.generator = GeneratorTransformer(n_features=num_features, hidden_dim=hidden_dim*4, seq_len=seq_len, narrow_attn_heads=narrow_attn_heads*2, num_layers=num_layers*2, dropout=dropout, noise_length=noise_length)
+        self.generator = GeneratorTransformer(n_features=num_features, hidden_dim=hidden_dim, seq_len=seq_len, narrow_attn_heads=narrow_attn_heads, num_layers=num_layers, dropout=dropout, noise_length=noise_length)
         self.discriminator = DiscriminatorTransformer(n_features=num_features, hidden_dim=hidden_dim, seq_len=seq_len, narrow_attn_heads=narrow_attn_heads, num_layers=num_layers, dropout=dropout)
 
     def forward(self, X, obj='discriminator'):
