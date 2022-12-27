@@ -113,8 +113,9 @@ class StepByStep(object):
             loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
             loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
             loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
-            loss_discriminator.backward()
-            self.discriminator_optimizer.step()
+            if loss_discriminator > 0.15:
+                loss_discriminator.backward()
+                self.discriminator_optimizer.step()
 
             # training generator
             for i in range(self.n_clip):
