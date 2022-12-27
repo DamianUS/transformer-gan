@@ -56,7 +56,8 @@ class GeneratorTransformer(nn.Module):
         # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
         transformer_out = self.transformer_encoder(source_sequence)
         out = self.out_linear(transformer_out)
-        return self.tanh(out)
+        #return self.tanh(out)
+        return out
 
     def get_target_mask(self, size) -> torch.tensor:
         # Generates a square matrix where each row allows one event more to be seen
