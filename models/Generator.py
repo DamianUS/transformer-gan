@@ -50,7 +50,7 @@ class GeneratorTransformer(nn.Module):
         # Src size must be (batch_size, src sequence length)
         # Positional encoding - Out size = (batch_size, sequence length, dim_model)
         #x is the noise with shape batch_size, 100
-        transformed_noise = self.linear(x).view(x.shape[0], self.n_features, -1).permute(0,2,1)
+        transformed_noise = self.linear(x).view(x.shape[0], -1, self.n_features)
         source_sequence = self.positional_encoding(self.proj(transformed_noise))
         # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
         transformer_out = self.transformer_encoder(source_sequence)
