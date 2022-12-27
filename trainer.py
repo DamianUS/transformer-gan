@@ -189,7 +189,7 @@ class StepByStep(object):
     def train(self, n_epochs, seed=42, n_clip=5):
         # To ensure reproducibility of the training process
         self.set_seed(seed)
-        self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.01, total_iters=50*len(self.train_loader))
+        self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.01, total_iters=100*len(self.train_loader))
         self.n_clip = n_clip
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
             # Keeps track of the numbers of epochs
