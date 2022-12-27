@@ -44,6 +44,7 @@ class GeneratorTransformer(nn.Module):
         )
         self.proj = nn.Linear(n_features, hidden_dim)  # from n_features to encoder hidden dimensions
         self.out_linear = nn.Linear(hidden_dim, n_features)  # from decoder hidden dimensions to output dimensions
+        self.tanh = nn.Tanh()
 
     def forward(self, x):
         device = next(self.parameters()).device
@@ -55,7 +56,7 @@ class GeneratorTransformer(nn.Module):
         # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
         transformer_out = self.transformer_encoder(source_sequence)
         out = self.out_linear(transformer_out)
-        return out
+        return self.tanh(out)
 
     def get_target_mask(self, size) -> torch.tensor:
         # Generates a square matrix where each row allows one event more to be seen
