@@ -104,10 +104,10 @@ def main(args):
     model = TransformerGAN(num_features=n_features, seq_len=seq_len, batch_size=batch_size, num_layers=num_layers, hidden_dim=hidden_dim, narrow_attn_heads=narrow_attn_heads, dropout=dropout, noise_length=100)
     model.to(args.device)
     loss = nn.BCEWithLogitsLoss()
-    generator_optimizer = optim.Adam(model.generator.parameters(), lr=lr)
-    discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=lr)
-    #generator_optimizer = optim.Adam(model.generator.parameters(), lr=lr, betas=(0.5, 0.999))
-    #discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
+    #generator_optimizer = optim.Adam(model.generator.parameters(), lr=lr)
+    #discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=lr)
+    generator_optimizer = optim.Adam(model.generator.parameters(), lr=lr, betas=(0.5, 0.999))
+    discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
 
     initial_epoch = 0
     initial_generator_losses = []
