@@ -105,18 +105,6 @@ class StepByStep(object):
             # Sets model to TRAIN mode
             self.model.train()
 
-            # training discriminator
-            self.discriminator_optimizer.zero_grad()
-            x_hat = self.model(x, obj='generator')
-            pred_real = self.model(x.to(self.device), obj='discriminator')
-            pred_fake = self.model(x_hat.detach(), obj='discriminator')
-            loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
-            loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
-            loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
-            if loss_discriminator > 0.15:
-                loss_discriminator.backward()
-                self.discriminator_optimizer.step()
-
             # training generator
             for i in range(self.n_clip):
                 if i == 0:
@@ -134,6 +122,18 @@ class StepByStep(object):
                 loss_generator = self.loss_fn(pred_fake, torch.ones_like(pred_fake))
                 loss_generator.backward()
                 self.generator_optimizer.step()
+
+            # training discriminator
+            self.discriminator_optimizer.zero_grad()
+            x_hat = self.model(x, obj='generator')
+            pred_real = self.model(x.to(self.device), obj='discriminator')
+            pred_fake = self.model(x_hat.detach(), obj='discriminator')
+            loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
+            loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
+            loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
+            if loss_discriminator > 0.15:
+                loss_discriminator.backward()
+                self.discriminator_optimizer.step()
             # Returns the loss
             return loss_generator.item(), loss_discriminator_fake.item(), loss_discriminator_real.item()
         # Returns the function that will be called inside the train loop
