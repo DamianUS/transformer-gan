@@ -101,7 +101,7 @@ def main(args):
     torch.manual_seed(43)
 
     n_features = scaled_x_train_tensor.shape[2]  # Batch first
-    model = TransformerGAN(num_features=n_features, seq_len=seq_len, batch_size=batch_size, num_layers=num_layers, hidden_dim=hidden_dim, narrow_attn_heads=narrow_attn_heads, dropout=0, noise_length=100)
+    model = TransformerGAN(num_features=n_features, seq_len=seq_len, batch_size=batch_size, num_layers=num_layers, hidden_dim=hidden_dim, narrow_attn_heads=narrow_attn_heads, dropout=dropout, noise_length=100)
     model.to(args.device)
     loss = nn.BCEWithLogitsLoss()
     generator_optimizer = optim.Adam(model.generator.parameters(), lr=lr)
