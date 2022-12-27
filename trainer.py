@@ -166,7 +166,7 @@ class StepByStep(object):
             mini_batch_discriminator_fake_losses.append(loss_discriminator_fake)
             mini_batch_discriminator_real_losses.append(loss_discriminator_real)
             mini_batch_progress_bar.set_description(
-                f'Minibatch losses: Generator: {loss_generator:.4f}. Discriminator fake: {loss_discriminator_fake:.4f}. Discriminator real: {loss_discriminator_real:.4f. lr: {self.scheduler.get_last_lr() if self.scheduler else 0}}'
+                f'Minibatch losses: Generator: {loss_generator:.4f}. Discriminator fake: {loss_discriminator_fake:.4f}. Discriminator real: {loss_discriminator_real:.4f}. lr: {self.scheduler.get_last_lr() if self.scheduler else 0:.4f}'
             )
 
             if not validation:
