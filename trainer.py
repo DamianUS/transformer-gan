@@ -116,10 +116,7 @@ class StepByStep(object):
             loss_discriminator.backward()
             self.discriminator_optimizer.step()
 
-
-
-
-            # training discriminator
+            # training generator
             for i in range(self.n_clip):
                 if i == 0:
                     x_generator, y_generator = x, y
