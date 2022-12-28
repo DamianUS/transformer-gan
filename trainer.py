@@ -192,8 +192,8 @@ class StepByStep(object):
         epoch_stabilize_lr = 10
         self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.01, total_iters=epoch_stabilize_lr*len(self.train_loader))
         self.n_clip = n_clip
-        n_clip_target = 20
-        epoch_stabilize_n_clip = 5
+        n_clip_target = 1
+        epoch_stabilize_n_clip = 20
         n_clip_epoch_decrement = (n_clip - n_clip_target) / (epoch_stabilize_n_clip - epoch_stabilize_lr)
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
             # Keeps track of the numbers of epochs
