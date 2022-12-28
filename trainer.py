@@ -189,11 +189,11 @@ class StepByStep(object):
     def train(self, n_epochs, seed=42, n_clip=5):
         # To ensure reproducibility of the training process
         self.set_seed(seed)
-        epoch_stabilize_lr = 10
+        epoch_stabilize_lr = 2
         self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.01, total_iters=epoch_stabilize_lr*len(self.train_loader))
         self.n_clip = n_clip
         n_clip_target = 1
-        epoch_stabilize_n_clip = 30
+        epoch_stabilize_n_clip = 5
         n_clip_epoch_decrement = (n_clip - n_clip_target) / (epoch_stabilize_n_clip - epoch_stabilize_lr)
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
             # Keeps track of the numbers of epochs
@@ -220,6 +220,7 @@ class StepByStep(object):
                 os.makedirs(self.checkpoints_directory, exist_ok=True)
                 self.save_checkpoint(f'{self.checkpoints_directory}epoch_{self.total_epochs}.pth')
             if epoch >= epoch_stabilize_lr:
+                print(round(self.n_clip-n_clip_epoch_decrement))
                 self.n_clip = round(self.n_clip-n_clip_epoch_decrement)
         if self.writer:
             # Closes the writer
