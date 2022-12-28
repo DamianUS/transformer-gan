@@ -189,7 +189,7 @@ class StepByStep(object):
     def train(self, n_epochs, seed=42, n_clip=5):
         # To ensure reproducibility of the training process
         self.set_seed(seed)
-        epoch_stabilize_lr = 20
+        epoch_stabilize_lr = 15
         self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.01, total_iters=epoch_stabilize_lr*len(self.train_loader))
         self.n_clip = n_clip
         n_clip_target = 1
