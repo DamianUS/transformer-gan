@@ -82,7 +82,7 @@ def main(args):
     gen_narrow_attn_heads = args.gen_narrow_attn_heads
     dis_narrow_attn_heads = args.dis_narrow_attn_heads
     epoch_stabilize_lr = args.epoch_stabilize_lr
-    n_clip_target = args.epoch_stabilize_lr
+    n_clip_target = args.n_clip_target
     epoch_stabilize_n_clip = args.epoch_stabilize_n_clip
     params = vars(args)
 
