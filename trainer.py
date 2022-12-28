@@ -167,7 +167,7 @@ class StepByStep(object):
             mini_batch_discriminator_real_losses.append(loss_discriminator_real)
             lr = self.scheduler.get_last_lr()[0] if self.scheduler else 0.0
             mini_batch_progress_bar.set_description(
-                f'Minibatch losses: Generator: {loss_generator:.4f}. Discriminator fake: {loss_discriminator_fake:.4f}. Discriminator real: {loss_discriminator_real:.4f}. lr: {lr:.6f}'
+                f'Minibatch losses: Generator: {loss_generator:.4f}. Discriminator fake: {loss_discriminator_fake:.4f}. Discriminator real: {loss_discriminator_real:.4f}. lr: {lr:.6f}. clip: {self.n_clip}'
             )
 
             if not validation:
@@ -193,7 +193,7 @@ class StepByStep(object):
         self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.01, total_iters=epoch_stabilize_lr*len(self.train_loader))
         self.n_clip = n_clip
         n_clip_target = 1
-        epoch_stabilize_n_clip = 50
+        epoch_stabilize_n_clip = 30
         n_clip_epoch_decrement = (n_clip - n_clip_target) / (epoch_stabilize_n_clip - epoch_stabilize_lr)
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
             # Keeps track of the numbers of epochs
