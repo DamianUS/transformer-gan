@@ -81,6 +81,9 @@ def main(args):
     dis_hidden_dim = args.dis_hidden_dim
     gen_narrow_attn_heads = args.gen_narrow_attn_heads
     dis_narrow_attn_heads = args.dis_narrow_attn_heads
+    epoch_stabilize_lr = args.epoch_stabilize_lr
+    n_clip_target = args.epoch_stabilize_lr
+    epoch_stabilize_n_clip = args.epoch_stabilize_lr
     params = vars(args)
 
     experiment_root_directory_name = f'experiments/transfgan_trace-{trace}_gen_layers-{gen_num_layers}_dis_layers-{dis_num_layers}_gen_hidden-{gen_hidden_dim}_dis_hidden-{dis_hidden_dim}_gen_attn-{gen_narrow_attn_heads}_dis_attn-{dis_narrow_attn_heads}_gen_dropout-{gen_dropout}_dis_dropout-{dis_dropout}_gen_lr-{gen_lr}_dis_lr-{dis_lr}_scaling-{scaling_method}/'
@@ -133,7 +136,7 @@ def main(args):
                          initial_discriminator_real_losses=initial_discriminator_real_losses, device=args.device)
     trainer.set_loaders(train_loader, generator_loader)
     trainer.set_tensorboard(tensorboard_model, folder='experiments/tensorboards')
-    trainer.train(epochs, n_clip=n_clip)
+    trainer.train(epochs, n_clip=n_clip, epoch_stabilize_lr=epoch_stabilize_lr, n_clip_target=n_clip_target, epoch_stabilize_n_clip=epoch_stabilize_n_clip)
 
     metrics_text_file = open(experiment_root_directory_name + "metrics.txt", "w")
     metrics_text_file.write('no hay métricas')
@@ -194,8 +197,20 @@ if __name__ == '__main__':
         default=0.001,
         type=float)
     parser.add_argument(
+        '--epoch_stabilize_lr',
+        default=25,
+        type=int)
+    parser.add_argument(
         '--n_clip',
         default=5,
+        type=int)
+    parser.add_argument(
+        '--n_clip_target',
+        default=2,
+        type=int)
+    parser.add_argument(
+        '--epoch_stabilize_n_clip',
+        default=50,
         type=int)
     parser.add_argument(
         '--gen_dropout',
