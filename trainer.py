@@ -195,6 +195,7 @@ class StepByStep(object):
         n_clip_target = 1
         epoch_stabilize_n_clip = 20
         n_clip_epoch_decrement = (n_clip - n_clip_target) / (epoch_stabilize_n_clip - epoch_stabilize_lr)
+        print(n_clip_epoch_decrement)
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
             # Keeps track of the numbers of epochs
             # by updating the corresponding attribute
