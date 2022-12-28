@@ -195,7 +195,6 @@ class StepByStep(object):
         n_clip_target = 1
         epoch_stabilize_n_clip = 20
         n_clip_epoch_decrement = (n_clip - n_clip_target) / (epoch_stabilize_n_clip - epoch_stabilize_lr)
-        print(n_clip_epoch_decrement)
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
             # Keeps track of the numbers of epochs
             # by updating the corresponding attribute
@@ -220,9 +219,9 @@ class StepByStep(object):
             if self.save_checkpoints == True:
                 os.makedirs(self.checkpoints_directory, exist_ok=True)
                 self.save_checkpoint(f'{self.checkpoints_directory}epoch_{self.total_epochs}.pth')
-            if epoch >= epoch_stabilize_lr:
-                print(round(self.n_clip-n_clip_epoch_decrement))
-                self.n_clip = round(self.n_clip-n_clip_epoch_decrement)
+            if epoch > epoch_stabilize_lr and epoch <= epoch_stabilize_n_clip:
+                decrement = (epoch - epoch_stabilize_lr)*n_clip_epoch_decrement
+                self.n_clip = round(n_clip-decrement)
         if self.writer:
             # Closes the writer
             self.writer.close()
