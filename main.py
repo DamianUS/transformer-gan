@@ -83,7 +83,7 @@ def main(args):
     dis_narrow_attn_heads = args.dis_narrow_attn_heads
     epoch_stabilize_lr = args.epoch_stabilize_lr
     n_clip_target = args.epoch_stabilize_lr
-    epoch_stabilize_n_clip = args.epoch_stabilize_lr
+    epoch_stabilize_n_clip = args.epoch_stabilize_n_clip
     params = vars(args)
 
     experiment_root_directory_name = f'experiments/transfgan_trace-{trace}_gen_layers-{gen_num_layers}_dis_layers-{dis_num_layers}_gen_hidden-{gen_hidden_dim}_dis_hidden-{dis_hidden_dim}_gen_attn-{gen_narrow_attn_heads}_dis_attn-{dis_narrow_attn_heads}_gen_dropout-{gen_dropout}_dis_dropout-{dis_dropout}_gen_lr-{gen_lr}_dis_lr-{dis_lr}_scaling-{scaling_method}/'
