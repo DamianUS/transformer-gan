@@ -216,8 +216,8 @@ class StepByStep(object):
             if self.save_checkpoints == True:
                 os.makedirs(self.checkpoints_directory, exist_ok=True)
                 self.save_checkpoint(f'{self.checkpoints_directory}epoch_{self.total_epochs}.pth')
-            if epoch > epoch_stabilize_lr and epoch <= epoch_stabilize_n_clip:
-                decrement = (epoch - epoch_stabilize_lr)*n_clip_epoch_decrement
+            if epoch <= epoch_stabilize_n_clip:
+                decrement = epoch*n_clip_epoch_decrement
                 self.n_clip = round(n_clip-decrement)
         if self.writer:
             # Closes the writer
