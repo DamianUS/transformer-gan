@@ -117,7 +117,7 @@ def main(args):
     #generator_optimizer = optim.Adam(model.generator.parameters(), lr=gen_lr, betas=(0.5, 0.999))
     #discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=dis_lr, betas=(0.5, 0.999))
 
-    initial_epoch = 10
+    initial_epoch = 0
     initial_generator_losses = []
     initial_discriminator_fake_losses = []
     initial_discriminator_real_losses = []
