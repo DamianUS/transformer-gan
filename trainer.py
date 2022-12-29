@@ -227,7 +227,7 @@ class StepByStep(object):
                 for g in self.discriminator_optimizer.param_groups:
                     g['lr'] = initial_dis_lr if n_clip_target != self.n_clip else initial_dis_lr/2
                 self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader)*2)
-
+                self.discriminator_optimizer.step()
         if self.writer:
             # Closes the writer
             self.writer.close()
