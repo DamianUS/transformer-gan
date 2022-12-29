@@ -188,6 +188,7 @@ class StepByStep(object):
         
     def train(self, n_epochs, seed=42, n_clip=5, epoch_stabilize_lr=25, n_clip_target=2, epoch_stabilize_n_clip=50):
         # To ensure reproducibility of the training process
+        initial_dis_lr = self.discriminator_optimizer.defaults['lr']
         self.set_seed(seed)
         self.n_clip = n_clip_target
         if self.total_epochs == 0:
@@ -223,6 +224,8 @@ class StepByStep(object):
                 decrement = epoch*n_clip_epoch_decrement
                 self.n_clip = round(n_clip-decrement)
                 if self.n_clip != last_n_clip:
+                    for g in self.discriminator_optimizer.param_groups:
+                        g['lr'] = initial_dis_lr
                     self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001,
                                                                        total_iters=epoch_stabilize_n_clip * len(
                                                                            self.train_loader))
