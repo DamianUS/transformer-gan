@@ -192,7 +192,7 @@ class StepByStep(object):
         self.set_seed(seed)
         self.n_clip = n_clip_target
         if self.total_epochs == 0:
-            self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader))
+            self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader)*2)
             self.n_clip = n_clip
         n_clip_epoch_decrement = (n_clip - n_clip_target) / epoch_stabilize_n_clip
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
@@ -226,7 +226,7 @@ class StepByStep(object):
             if epoch % epoch_stabilize_lr == 0:
                 for g in self.discriminator_optimizer.param_groups:
                     g['lr'] = initial_dis_lr if n_clip_target != self.n_clip else initial_dis_lr/2
-                self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader))
+                self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader)*2)
 
         if self.writer:
             # Closes the writer
