@@ -105,7 +105,7 @@ class StepByStep(object):
         mid = t * x + (1 - t) * x_hat
         # set it to require grad info
         mid.requires_grad_()
-        pred = self.model(mid.to(self.device), obj='discriminator')
+        pred = torch.sigmoid(self.model(mid.to(self.device), obj='discriminator'))
         grads = torch.autograd.grad(outputs=pred, inputs=mid,
                               grad_outputs=torch.ones_like(pred),
                               create_graph=True, retain_graph=True, only_inputs=True)[0]
