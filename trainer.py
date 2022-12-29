@@ -109,8 +109,8 @@ class StepByStep(object):
         grads = torch.autograd.grad(outputs=pred, inputs=mid,
                               grad_outputs=torch.ones_like(pred),
                               create_graph=True, retain_graph=True, only_inputs=True)[0]
-        gp = torch.pow(grads.norm(2, dim=1) - 1, 2).mean()
-        return gp
+        grad_penalty = (((grads.view(grads.shape[0], -1) ** 2).sum(dim=1).sqrt() - 1) ** 2).mean()
+        return grad_penalty
 
     def _make_train_step_fn(self):
         # This method does not need ARGS... it can refer to
