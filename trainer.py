@@ -96,6 +96,22 @@ class StepByStep(object):
         suffix = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         self.writer = SummaryWriter(f'{folder}/{name}_{suffix}')
 
+    def gradient_penalty(self, x, x_hat):
+        t = torch.FloatTensor(x.shape[0], 1, 1).uniform_(0, 1).to(self.device)
+        t = t.expand(x.shape[0], x.shape[1], x.shape[2])
+        # [b, 1] => [b, 2]  broadcasting so t is the same for x1 and x2
+        t = t.expand_as(x)
+        # interpolation
+        mid = t * x + (1 - t) * x_hat
+        # set it to require grad info
+        mid.requires_grad_()
+        pred = self.model(mid.to(self.device), obj='discriminator')
+        grads = torch.autograd.grad(outputs=pred, inputs=mid,
+                              grad_outputs=torch.ones_like(pred),
+                              create_graph=True, retain_graph=True, only_inputs=True)[0]
+        gp = torch.pow(grads.norm(2, dim=1) - 1, 2).mean()
+        return gp
+
     def _make_train_step_fn(self):
         # This method does not need ARGS... it can refer to
         # the attributes: self.model, self.loss_fn and self.optimizer
@@ -119,7 +135,9 @@ class StepByStep(object):
                 x_hat = self.model(x_generator, obj='generator')
                 self.generator_optimizer.zero_grad()
                 pred_fake = self.model(x_hat, obj='discriminator')
-                loss_generator = self.loss_fn(pred_fake, torch.ones_like(pred_fake))
+                sigmoid_pred_fake_mean = torch.sigmoid(pred_fake).mean()
+                loss_generator = -sigmoid_pred_fake_mean
+                #loss_generator = self.loss_fn(pred_fake, torch.ones_like(pred_fake))
                 loss_generator.backward()
                 self.generator_optimizer.step()
 
@@ -128,12 +146,18 @@ class StepByStep(object):
             x_hat = self.model(x, obj='generator')
             pred_real = self.model(x.to(self.device), obj='discriminator')
             pred_fake = self.model(x_hat.detach(), obj='discriminator')
-            loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
-            loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
-            loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
-            if loss_discriminator_fake > 0.2:
-                loss_discriminator.backward()
-                self.discriminator_optimizer.step()
+            sigmoid_pred_real_mean = torch.sigmoid(pred_real).mean()
+            sigmoid_pred_fake_mean = torch.sigmoid(pred_fake).mean()
+            loss_discriminator_real = -sigmoid_pred_real_mean
+            loss_discriminator_fake = sigmoid_pred_fake_mean
+            gradient_penalty = self.gradient_penalty(x, x_hat.detach())
+            loss_discriminator = loss_discriminator_real + loss_discriminator_fake + 2 * gradient_penalty
+            #loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
+            #loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
+            #loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
+            #if loss_discriminator_fake > 0.2:
+            loss_discriminator.backward()
+            self.discriminator_optimizer.step()
             # Returns the loss
             return loss_generator.item(), loss_discriminator_fake.item(), loss_discriminator_real.item()
         # Returns the function that will be called inside the train loop

@@ -106,7 +106,7 @@ def main(args):
 
     train_data = TensorDataset(scaled_x_train_tensor.float(), scaled_y_train_tensor.float())
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-    generator_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    generator_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)#WGAN
 
     torch.manual_seed(43)
 
