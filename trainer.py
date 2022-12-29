@@ -104,18 +104,6 @@ class StepByStep(object):
         def perform_train_step_fn(x, y):
             # Sets model to TRAIN mode
             self.model.train()
-            if not self.initialized:
-                for i in range(20):
-                    # training discriminator
-                    self.discriminator_optimizer.zero_grad()
-                    x_hat = self.model(x, obj='generator')
-                    pred_real = self.model(x.to(self.device), obj='discriminator')
-                    pred_fake = self.model(x_hat.detach(), obj='discriminator')
-                    loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
-                    loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
-                    loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
-                    loss_discriminator.backward()
-                    self.discriminator_optimizer.step()
 
             # training generator
             for i in range(self.n_clip):
