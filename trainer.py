@@ -104,6 +104,18 @@ class StepByStep(object):
         def perform_train_step_fn(x, y):
             # Sets model to TRAIN mode
             self.model.train()
+            if not self.initialized:
+                for i in range(20):
+                    # training discriminator
+                    self.discriminator_optimizer.zero_grad()
+                    x_hat = self.model(x, obj='generator')
+                    pred_real = self.model(x.to(self.device), obj='discriminator')
+                    pred_fake = self.model(x_hat.detach(), obj='discriminator')
+                    loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
+                    loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
+                    loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
+                    loss_discriminator.backward()
+                    self.discriminator_optimizer.step()
 
             # training generator
             for i in range(self.n_clip):
@@ -192,6 +204,7 @@ class StepByStep(object):
         # self.set_seed(seed)
         # self.n_clip = n_clip_target
         # if self.total_epochs == 0:
+        self.initialized = 0
         self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader))
         self.n_clip = n_clip
         n_clip_epoch_decrement = (n_clip - n_clip_target) / epoch_stabilize_n_clip
