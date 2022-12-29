@@ -11,7 +11,7 @@ import pandas as pd
 from models.TransformerGAN import TransformerGAN
 
 
-def initialize_checkpoint(checkpoints_directory_name, epochs, model,  generator_optimizer, discriminator_optimizer):
+def initialize_checkpoint(checkpoints_directory_name, epochs, model,  generator_optimizer, discriminator_optimizer, discriminator_target_lr):
     last_checkpoint_path = \
         sorted(os.listdir(checkpoints_directory_name),
                key=lambda fileName: int(fileName.split('.')[0].split('_')[1]),
@@ -24,6 +24,8 @@ def initialize_checkpoint(checkpoints_directory_name, epochs, model,  generator_
     model.load_state_dict(checkpoint['model_state_dict'])
     generator_optimizer.load_state_dict(checkpoint['generator_optimizer_state_dict'])
     discriminator_optimizer.load_state_dict(checkpoint['discriminator_optimizer_state_dict'])
+    for g in discriminator_optimizer.param_groups:
+        g['lr'] = discriminator_target_lr
     initial_epoch = checkpoint_epoch
     initial_generator_losses = checkpoint['generator_loss']
     initial_discriminator_fake_losses = checkpoint['discriminator_fake_loss']
@@ -128,7 +130,7 @@ def main(args):
     if checkpoint_available == True:
         # format: epoch_X
         initial_epoch, initial_generator_losses, initial_discriminator_fake_losses, initial_discriminator_real_losses = initialize_checkpoint(
-            checkpoints_directory_name=checkpoints_directory_name, epochs=epochs, model=model, generator_optimizer=generator_optimizer, discriminator_optimizer=discriminator_optimizer)
+            checkpoints_directory_name=checkpoints_directory_name, epochs=epochs, model=model, generator_optimizer=generator_optimizer, discriminator_optimizer=discriminator_optimizer, discriminator_target_lr=dis_lr)
 
     trainer = StepByStep(model=model, loss_fn=loss, generator_optimizer=generator_optimizer, discriminator_optimizer=discriminator_optimizer,
                          save_checkpoints=True, checkpoints_directory=checkpoints_directory_name, checkpoint_context=params, initial_epoch=initial_epoch,
