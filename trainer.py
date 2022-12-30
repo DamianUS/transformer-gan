@@ -146,7 +146,7 @@ class StepByStep(object):
             x_hat = self.model(x, obj='generator')
             should_use_noise_prob = random.uniform(0, 1)
             if should_use_noise_prob < 0.3:
-                noise = torch.randn_like(x).float().reshape(-1, 1)
+                noise = torch.randn_like(x).float().reshape(-1, 1).cpu()
                 scaler = MinMaxScaler(feature_range=(-1, 1))
                 scaler.fit(noise)
                 x_hat = torch.as_tensor(scaler.transform(noise).reshape(x.shape)).float().to(self.device)
