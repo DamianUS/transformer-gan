@@ -33,14 +33,17 @@ class GeneratorTransformer(nn.Module):
         super().__init__()
         self.seq_len = seq_len
         self.noise_length = noise_length
-        self.linear = nn.Linear(noise_length, seq_len * n_features)
+        self.linear = nn.Linear(noise_length, seq_len * 2 * n_features)
         self.n_features = n_features
         # LAYERS
         self.positional_encoding = PositionalEncoding(max_len=seq_len, d_model=hidden_dim, dropout=dropout)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=narrow_attn_heads, dropout=dropout, batch_first=True)
-        self.transformer_encoder = nn.TransformerEncoder(
-            encoder_layer,
-            num_layers=num_layers,
+        self.transformer = nn.Transformer(
+            d_model=hidden_dim,
+            nhead=narrow_attn_heads,
+            num_encoder_layers=num_layers,
+            num_decoder_layers=num_layers,
+            dropout=dropout,
+            batch_first=True
         )
         self.proj = nn.Linear(n_features, hidden_dim)  # from n_features to encoder hidden dimensions
         self.out_linear = nn.Linear(hidden_dim, n_features)  # from decoder hidden dimensions to output dimensions
@@ -49,12 +52,21 @@ class GeneratorTransformer(nn.Module):
     def forward(self, x):
         device = next(self.parameters()).device
         # Src size must be (batch_size, src sequence length)
-        # Positional encoding - Out size = (batch_size, sequence length, dim_model)
+        # Positional encoding- Out size = (batch_size, sequence length, dim_model)
         #x is the noise with shape batch_size, 100
         transformed_noise = self.linear(x).view(x.shape[0], -1, self.n_features)
-        source_sequence = self.positional_encoding(self.proj(transformed_noise))
+        source_sequence = transformed_noise[:, :self.seq_len, :]
+        shifted_target_sequence = transformed_noise[:, self.seq_len - 1:-1, :]
+
+        # Positional encoding - Out size = (batch_size, sequence length, dim_model)
+        source_sequence = self.positional_encoding(self.proj(source_sequence))
+        target_sequence = self.positional_encoding(self.proj(shifted_target_sequence))
+        target_mask = self.get_target_mask(size=target_sequence.shape[1]).to(device)
+
         # Transformer blocks - Out size = (sequence length, batch_size, num_tokens)
-        transformer_out = self.transformer_encoder(source_sequence)
+        transformer_out = self.transformer(source_sequence, target_sequence, tgt_mask=target_mask,
+                                           src_key_padding_mask=None,
+                                           tgt_key_padding_mask=None)
         out = self.out_linear(transformer_out)
         return self.tanh(out)
         #return out
