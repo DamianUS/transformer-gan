@@ -145,7 +145,7 @@ class StepByStep(object):
             self.discriminator_optimizer.zero_grad()
             x_hat = self.model(x, obj='generator')
             should_use_noise_prob = random.uniform(0, 1)
-            if should_use_noise_prob < 0.2:
+            if should_use_noise_prob < 0.1:
                 noise = torch.randn_like(x).float().reshape(-1, 1).cpu()
                 scaler = MinMaxScaler(feature_range=(-1, 1))
                 scaler.fit(noise)
