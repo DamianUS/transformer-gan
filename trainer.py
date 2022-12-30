@@ -144,10 +144,8 @@ class StepByStep(object):
             x_hat = self.model(x, obj='generator')
             should_use_noise_prob = random.uniform(0, 1)
             if should_use_noise_prob < 0.2:
-                noise = torch.randn((x.shape[0], x.shape[1], x.shape[2])).float().to(self.device)
-                pred_real = noise
-            else:
-                pred_real = self.model(x.to(self.device), obj='discriminator')
+                x = torch.randn((x.shape[0], x.shape[1], x.shape[2])).float().to(self.device)
+            pred_real = self.model(x.to(self.device), obj='discriminator')
             pred_fake = self.model(x_hat.detach(), obj='discriminator')
             loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
             loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
