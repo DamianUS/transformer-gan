@@ -225,7 +225,7 @@ class StepByStep(object):
         # self.n_clip = n_clip_target
         # if self.total_epochs == 0:
         if epoch_stabilize_lr > 1:
-            self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.001, total_iters=epoch_stabilize_lr * len(self.train_loader))
+            self.scheduler = torch.optim.lr_scheduler.LinearLR(self.discriminator_optimizer, start_factor=0.0001, total_iters=epoch_stabilize_lr * len(self.train_loader))
         self.n_clip = n_clip
         n_clip_epoch_decrement = (n_clip - n_clip_target) / epoch_stabilize_n_clip
         for epoch in tqdm(range(self.total_epochs, n_epochs)):
