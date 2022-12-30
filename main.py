@@ -105,7 +105,7 @@ def main(args):
         scaled_x_train_tensor, scaled_y_train_tensor = recover_ori_data(experiment_root_directory_name=experiment_root_directory_name, seq_len=args.seq_len, scaling_method=scaling_method, trace=trace)
 
     train_data = TensorDataset(scaled_x_train_tensor.float(), scaled_y_train_tensor.float())
-    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)#gradient penalty
     generator_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
     torch.manual_seed(43)
