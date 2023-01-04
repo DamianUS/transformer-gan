@@ -12,9 +12,9 @@ class TransformerGAN(torch.nn.Module):
         self.noise_length = noise_length
         self.generator = GeneratorTransformer(n_features=num_features, hidden_dim=gen_hidden_dim, seq_len=seq_len, narrow_attn_heads=gen_narrow_attn_heads, num_layers=gen_num_layers, dropout=gen_dropout, noise_length=noise_length)
         self.discriminator = DiscriminatorTransformer(n_features=num_features, hidden_dim=dis_hidden_dim, seq_len=seq_len, narrow_attn_heads=dis_narrow_attn_heads, num_layers=dis_num_layers, dropout=dis_dropout)
-        for name, module in self.discriminator.named_modules():
-            if isinstance(module, torch.nn.Linear):
-                self.discriminator._modules[name] = torch.nn.utils.parametrizations.spectral_norm(module)
+        spectral_modules = [(name, torch.nn.utils.parametrizations.spectral_norm(module)) for name,module in self.discriminator.named_modules()]
+        for name, spectral_module in spectral_modules:
+            self.discriminator._modules[name] = spectral_module
 
     def forward(self, X, obj='discriminator'):
         #print([name for name, _ in self.discriminator.named_children()])
