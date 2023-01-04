@@ -18,7 +18,7 @@ class TransformerGAN(torch.nn.Module):
 
     def forward(self, X, obj='discriminator'):
         #print([name for name, _ in self.discriminator.named_children()])
-        print([module for module in self.discriminator.modules() if isinstance(module, torch.nn.Linear)])
+        #print([module for module in self.discriminator.modules() if isinstance(module, torch.nn.Linear)])
         assert obj in ['generator','discriminator'], "obj must be either generator or discriminator"
         if obj == 'generator':
             device = next(self.parameters()).device
