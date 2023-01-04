@@ -15,7 +15,7 @@ class TransformerGAN(torch.nn.Module):
         spectral_modules = [(name, torch.nn.utils.parametrizations.spectral_norm(module)) for name,module in self.discriminator.named_modules()]
         for name, spectral_module in spectral_modules:
             print(name, spectral_module)
-            self.discriminator._modules[name] = spectral_module
+            #self.discriminator._modules[name] = spectral_module
 
     def forward(self, X, obj='discriminator'):
         #print([name for name, _ in self.discriminator.named_children()])
