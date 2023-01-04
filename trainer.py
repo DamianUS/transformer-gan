@@ -144,26 +144,26 @@ class StepByStep(object):
             # training discriminator
             self.discriminator_optimizer.zero_grad()
             x_hat = self.model(x, obj='generator')
-            should_use_noise_prob = random.uniform(0, 1)
-            if should_use_noise_prob < 0.1:
-                noise = torch.randn_like(x).float().reshape(-1, 1).cpu()
-                scaler = MinMaxScaler(feature_range=(-1, 1))
-                scaler.fit(noise)
-                x_hat = torch.as_tensor(scaler.transform(noise).reshape(x.shape)).float().to(self.device)
-                noise = torch.randn_like(x).float().reshape(-1, 1).cpu()
-                scaler = MinMaxScaler(feature_range=(-1, 1))
-                scaler.fit(noise)
-                x = torch.as_tensor(scaler.transform(noise).reshape(x.shape)).float().to(self.device)
+            # should_use_noise_prob = random.uniform(0, 1)
+            # if should_use_noise_prob < 0.1:
+            #     noise = torch.randn_like(x).float().reshape(-1, 1).cpu()
+            #     scaler = MinMaxScaler(feature_range=(-1, 1))
+            #     scaler.fit(noise)
+            #     x_hat = torch.as_tensor(scaler.transform(noise).reshape(x.shape)).float().to(self.device)
+            #     noise = torch.randn_like(x).float().reshape(-1, 1).cpu()
+            #     scaler = MinMaxScaler(feature_range=(-1, 1))
+            #     scaler.fit(noise)
+            #     x = torch.as_tensor(scaler.transform(noise).reshape(x.shape)).float().to(self.device)
             pred_real = self.model(x.to(self.device), obj='discriminator')
             pred_fake = self.model(x_hat.detach(), obj='discriminator')
             loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
             loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
-            loss_gp = self.gradient_penalty(x, x_hat)*0.25
+            #loss_gp = self.gradient_penalty(x, x_hat)*0.25
             loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
 
             #if loss_discriminator_fake > 0.2:
             loss_discriminator.backward()
-            loss_gp.backward()
+            #loss_gp.backward()
             #adding gradient penalty
             self.discriminator_optimizer.step()
             # Returns the loss
