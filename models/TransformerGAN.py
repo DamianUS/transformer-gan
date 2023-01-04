@@ -11,11 +11,11 @@ class TransformerGAN(torch.nn.Module):
         self.batch_size = batch_size
         self.noise_length = noise_length
         self.generator = GeneratorTransformer(n_features=num_features, hidden_dim=gen_hidden_dim, seq_len=seq_len, narrow_attn_heads=gen_narrow_attn_heads, num_layers=gen_num_layers, dropout=gen_dropout, noise_length=noise_length)
-        self.discriminator = torch.nn.utils.parametrizations.spectral_norm(DiscriminatorTransformer(n_features=num_features, hidden_dim=dis_hidden_dim, seq_len=seq_len, narrow_attn_heads=dis_narrow_attn_heads, num_layers=dis_num_layers, dropout=dis_dropout).transformer_encoder.linear1)
+        self.discriminator = DiscriminatorTransformer(n_features=num_features, hidden_dim=dis_hidden_dim, seq_len=seq_len, narrow_attn_heads=dis_narrow_attn_heads, num_layers=dis_num_layers, dropout=dis_dropout)
 
     def forward(self, X, obj='discriminator'):
         #print([name for name, _ in self.discriminator.named_children()])
-        print(self.discriminator.transformer_encoder.linear1)
+        print([module for module in self.discriminator.modules() if isinstance(module, torch.nn.Linear)])
         assert obj in ['generator','discriminator'], "obj must be either generator or discriminator"
         if obj == 'generator':
             device = next(self.parameters()).device
