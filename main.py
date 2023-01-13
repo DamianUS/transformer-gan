@@ -115,7 +115,7 @@ def main(args):
     model.to(args.device)
     loss = nn.BCEWithLogitsLoss()
     #loss = nn.MSELoss()
-    generator_optimizer = optim.Adam(model.generator.parameters(), lr=gen_lr)
+    generator_optimizer = optim.Adam(model.generator.parameters(), lr=gen_lr, betas=(0.5, 0.9))
     discriminator_optimizer = optim.Adam(model.discriminator.parameters(), lr=dis_lr, betas=(0.5, 0.9))
     #generator_optimizer = optim.AdamW(model.generator.parameters(), lr=gen_lr)
     #discriminator_optimizer = optim.AdamW(model.discriminator.parameters(), lr=dis_lr)
