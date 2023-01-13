@@ -159,11 +159,11 @@ class StepByStep(object):
             loss_discriminator_real = self.loss_fn(pred_real, torch.ones_like(pred_real))
             loss_discriminator_fake = self.loss_fn(pred_fake, torch.zeros_like(pred_fake))
             loss_gp = self.gradient_penalty(x, x_hat)
-            loss_discriminator = (loss_discriminator_real + loss_discriminator_fake) * 0.5
+            loss_discriminator = loss_gp + (loss_discriminator_real + loss_discriminator_fake) * 0.5
 
             #if loss_discriminator_fake > 0.2:
             loss_discriminator.backward()
-            loss_gp.backward()
+            #loss_gp.backward()
             #adding gradient penalty
             self.discriminator_optimizer.step()
             # Returns the loss
