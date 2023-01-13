@@ -40,8 +40,8 @@ class DiscriminatorTransformer(nn.Module):
             num_layers=num_layers,
         )
         self.proj = nn.Linear(n_features, hidden_dim)  # from n_features to encoder hidden dimensions
-        self.linear = nn.Linear(hidden_dim, 1)  # from decoder hidden dimensions to classification
-        self.pool = nn.AdaptiveAvgPool1d(n_features)
+        self.linear = nn.Linear(hidden_dim, 5)  # from decoder hidden dimensions to classification
+        self.pool = nn.AdaptiveAvgPool1d(1)
 
     def forward(self, X):
         device = next(self.parameters()).device
