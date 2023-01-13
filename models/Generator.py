@@ -37,7 +37,7 @@ class GeneratorTransformer(nn.Module):
         self.n_features = n_features
         # LAYERS
         self.positional_encoding = PositionalEncoding(max_len=seq_len, d_model=hidden_dim, dropout=dropout)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=narrow_attn_heads, dropout=dropout, batch_first=True)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=hidden_dim, nhead=narrow_attn_heads, dropout=dropout, batch_first=True, activation='gelu')
         self.transformer_encoder = nn.TransformerEncoder(
             encoder_layer,
             num_layers=num_layers,
